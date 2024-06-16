@@ -1,0 +1,79 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="col-lg-10 justify-content-center mt-5">
+    <div class="container mt-5">
+        <h1 class="mb-4">Shopping Cart</h1>
+        <div class="row">
+          <div class="col-lg-8">
+            <div class="card">
+              <div class="card-body">
+                <table class="table">
+                  <thead>
+                    <tr>
+                      <th scope="col">#</th>
+                      <th scope="col">Product</th>
+                      <th scope="col">Price</th>
+                      <th scope="col">Quantity</th>
+                      <th scope="col">Total</th>
+                      <th scope="col">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {% for product_id, details in cart.items %}
+                    <tr>
+                      <th scope="row">{{ forloop.counter }}</th>
+                      <td>{{ details.product_name }}</td>
+                      <td>{{currency_char}}{{ details.price|floatformat:2 }}</td>
+                      <form action="{% url 'update_cart' %}" method="post" class="update-cart-form">
+                        {% csrf_token %}
+                        <input type="hidden" name="product_id" value="{{ product_id }}">
+                        <td>
+                            <input type="number" name="new_quantity" class="form-control quantity-input" value="{{ details.quantity }}" min="1">
+                        </td>
+                    </form>
+                      <td>{{currency_char}}{{ details.total_price|floatformat:2 }}</td>
+                      <td>
+                        <form action="{% url 'remove_from_cart' product_id %}" method="post">
+                          {% csrf_token %}
+                          <button type="submit" class="btn btn-danger btn-sm">Remove</button>
+                        </form>
+                      </td>
+                    </tr>
+                    {% empty %}
+                      <tr><td colspan="6" class="text-center">Your cart is empty.</td></tr>
+                    {% endfor %}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+          <div class="col-lg-4">
+            <div class="card">
+              <div class="card-body">
+                <h5 class="card-title">Cart Summary</h5>
+                <p>Total Items: {{ total_items }}</p>
+                <p>Total Price: {{currency_char}}{{ total_price|floatformat:2 }}</p>
+                <a href="{{ url_pay }}" class="btn btn-dark">Checkout</a>
+                <!-- <form action="https://www.paypal.com/cgi-bin/webscr" method="post" target="_top">
+                  <input type="hidden" name="cmd" value="_s-xclick">
+                  <input type="hidden" name="hosted_button_id" value="YOUR_BUTTON_ID">
+                  <input style="margin-top: 10px;" type="image" width="150px" src="https://www.paypalobjects.com/webstatic/en_US/i/buttons/checkout-logo-large.png" name="submit" alt="PayPal - The safer, easier way to pay online!">
+                </form> -->
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+</div>
+<script>
+  // Listen for input changes on any element with the class 'quantity-input'
+  document.querySelectorAll('.quantity-input').forEach(function(input) {
+      input.addEventListener('change', function() {
+          // Submit the parent form of the input field when the value changes
+          this.form.submit();
+      });
+  });
+</script>
+
+{% endblock %}

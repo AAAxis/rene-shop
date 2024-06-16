@@ -1,0 +1,63 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="col-lg-10 justify-content-center">
+    <div class="text-center banner">
+      <a href="/">
+<!-- Image visible only on sm and md -->
+<img class="d-none d-md-block d-lg-block d-xl-block w-60 h-60 mx-auto" src="https://storage.googleapis.com/rene-shop/6.jpg" style="width: 75%;" alt="Banner Image" />
+<!-- Image visible on other (smaller and larger) devices -->
+<img class="d-md-none d-lg-none w-100 h-100" src="https://storage.googleapis.com/rene-shop/6.jpg" alt="Banner Image" />
+      </a>
+  </div>
+  <h2 class="text-center mt-3">New Arrivals</h2>
+  <div class="row">
+    <div class="col">
+        <a href="/product/1">
+      <div class="card text-center">
+          <div class="carousel-inner text-center">
+            <div class="carousel-item active">
+              <video class="text-center" playsinline="playsinline" autoplay="autoplay" muted="muted" width="300px" height="400px" loop="loop">
+                <source src="https://storage.googleapis.com/rene-shop/7ab475ca-2a2d-4122-9319-e1a62571ba19.mp4" type="video/mp4">
+              </video>
+            </div>
+          </div>
+        <div class="card-body">
+          <h2 class="card-title">“SWEATY KITTIES”</h2>
+          {% if currency_code == 'USD' %}
+          <p id="productprice" class="card-text">USD $150.00</p>
+          {% elif currency_code == 'EUR' %}
+          <p id="productprice" class="card-text">EUR €136.50</p>
+          {% elif currency_code == 'ILS' %}
+          <p id="productprice" class="card-text">ILS ₪553.50</p>
+          {% elif currency_code == 'UAH' %}
+          <p id="productprice" class="card-text">UAH ₴5713.50</p>
+          {% endif %}
+        </div>
+      </div>
+    </a>
+    </div>
+  </div>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+$(document).ready(function() {
+let slideIndex = 0;
+showSlides(slideIndex);
+
+$('.dot').click(function() {
+  slideIndex = $(this).index();
+  showSlides(slideIndex);
+
+});
+
+function showSlides(index) {
+  $('.slide').hide();
+  $('.slide').eq(index).show();
+  $('.dot').removeClass('active');
+  $('.dot').eq(index).addClass('active');
+}
+});
+</script> <!-- Include your JavaScript file -->
+{% for product in products %}
+{% endfor %}
+{% endblock %}

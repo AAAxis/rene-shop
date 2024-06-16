@@ -1,0 +1,119 @@
+{% extends 'base.html' %}
+{% block extra_head %}
+<meta property="og:title" content="{{ product.name }}">
+<meta property="og:description" content="{{ product.description }}">
+{% if product.photos.all %}
+<meta property="og:image" content="{{ product.photos.all.0.image.url }}">
+{% endif %}
+<meta name="twitter:title" content="{{ product.name }}">
+<meta name="twitter:description" content="{{ product.description }}">
+{% endblock %}
+{% block content %}
+{% load static %}
+<div class="col-lg-10 mt-5 justify-content-center">
+   <!-- Bootstrap 5.3 Large Modal -->
+<div class="modal fade" id="modelModal" tabindex="-1" aria-labelledby="modelModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="modelModalLabel">3D Model</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+            <div id="modelContainer" class="carousel-item active">
+                <!-- Initially visible -->
+                <img id="loadingImage" src="{% static 'img/IMG_3055.avif' %}" class="d-block card-img-top carousel-img-small" alt="Loading Image">
+                
+                <!-- Initially hidden -->
+                <div id="sceneContainer" class="d-block w-100 card__img text-center scene" style="display: none;"></div>
+              </div>
+  
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+    <div class="row g-0">
+        <div class="col-md-6">
+            <div class="d-flex flex-column justify-content-between preview">
+                <div class="preview">
+                    <!-- Large Image -->
+                    {% if product.photos.all %}
+                    <div class="mb-3">
+                        <img style="border: none;" src="{{ product.photos.all.0.image.url }}" class="img-fluid" id="main-image" alt="Main Image" />
+                    </div>
+                    <!-- Small Thumbnails -->
+                    <div class="justify-content-start thumbnail-container">
+                        {% for photo in product.photos.all %}
+                        <img src="{{ photo.image.url }}" class="img-thumbnail small-image" data-img-src="{{ photo.image.url }}" alt="Thumbnail {{ forloop.counter }}" />
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="details p-3">
+                <h3 class="product-title">{{ product.name }}</h3>
+                <form action="{% url 'add_to_cart' %}" method="post">
+                    {% csrf_token %}
+                    <div class="quantity mt-2 d-flex align-items-center">
+                        <label for="quantity" class="me-2">Quantity:</label>
+                        <button class="btn btn-dark btn-sm" id="decrease-quantity" type="button">-</button>
+                        <input type="number" id="quantity" name="quantity" min="1" max="100" value="1" class="form-control mx-2" style="width: 60px;">
+                        <button class="btn btn-dark btn-sm" id="increase-quantity" type="button">+</button>
+                    </div>
+                    <input type="hidden" name="product_id" value="{{ product.id }}">
+                    {% if product.sizes.all %}
+                    <p class="product-description">{{ product.description | safe }}</p>
+                    <h4 class="price">
+                    <p>{{ currency_code }} {{ currency_char }} {{ product.updated_price | floatformat:2 }}</p>
+                    </h4>
+                    <div class="action mt-3">
+                        <button type="submit" class="add-to-cart btn btn-dark">Add to Cart</button>
+                        <a href="https://buy.stripe.com/aEUdSBeQo3NigWQbII" class="btn btn-dark">Buy now</a>
+                        {% if product.link_3d %}
+                        <a href="#" class="btn btn-outline-dark" data-bs-toggle="modal" data-bs-target="#modelModal">3D</a>
+                        {% endif %}
+                    </div>
+                    {% else %}
+                    <p class="product-description">Out of stock</p>
+                    {% endif %}
+                </form>
+            </div>
+        </div>        
+    </div>
+</div>
+
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    const mainImage = document.getElementById('main-image');
+    const thumbnails = document.querySelectorAll('.small-image');
+
+    thumbnails.forEach(img => {
+        img.addEventListener('click', function() {
+            mainImage.src = this.dataset.imgSrc;
+        });
+    });
+});
+
+document.getElementById('increase-quantity').addEventListener('click', function() {
+    var quantityInput = document.getElementById('quantity');
+    var currentQuantity = parseInt(quantityInput.value);
+    quantityInput.value = currentQuantity + 1;
+});
+
+document.getElementById('decrease-quantity').addEventListener('click', function() {
+    var quantityInput = document.getElementById('quantity');
+    var currentQuantity = parseInt(quantityInput.value);
+    if (currentQuantity > 1) {
+        quantityInput.value = currentQuantity - 1;
+    }
+});
+</script>
+<script src='https://cdnjs.cloudflare.com/ajax/libs/three.js/110/three.min.js'></script>
+<script src="{% static 'js/script.js' %}"></script>
+{% endblock %}
